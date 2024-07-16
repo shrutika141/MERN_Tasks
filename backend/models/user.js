@@ -6,7 +6,10 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
 
     static associate(models) {
-      // define association/relationship here
+      User.hasMany(models.Order, {
+        foreignKey: 'userId',
+        as: 'orders',
+      });
     }
 
     validPassword(password) {

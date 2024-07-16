@@ -3,35 +3,34 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { ADD_USER_URL, EDIT_USERS_URL, GET_ALL_USERS_URL } from "../constants/url.ts";
 import { useDataService } from "../services/index.tsx";
+import { getUserRole } from '../components/common/index.tsx';
 
 export const useUsers = () => {
 
-  const getUserRole = () => {
-    const user = localStorage.getItem('user');
-    const role = user ? JSON.parse(user).role : 'null';
-    return role
-  };
+
 
   const getAllUsers = async () => {
     try {
       const response = await useDataService.getService(`${GET_ALL_USERS_URL}?role=${getUserRole()}`);
 
-      console.log(response)
       if (response.status === 200) return response?.data;
       else {
-        toast.error('Registration failed', {
+        toast.error('Failed to retrive Users Data', {
           position: 'top-center',
         });
       }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Internal Server Error', error);
+      toast.error('Internal Server Error', {
+        position: 'top-center',
+      });
     }
   };
 
   const addUser = async (userData: any) => {
     try {
-      const response = await useDataService.postService(ADD_USER_URL, userData);
-      if (response.status === 201) {
+      const response = await useDataService.postService(`${ADD_USER_URL}?role=${getUserRole()}`, userData);
+      if (response.status === 200) {
         toast.success('User added successfully', { position: 'top-center' });
         return response.data;
       } else {
@@ -46,9 +45,17 @@ export const useUsers = () => {
   const getUserById = async (userId: any) => {
     try {
       const response = await useDataService.getService(`${EDIT_USERS_URL}/${userId}`);
-      return response.data;
-    } catch (err) {
-      throw new Error(`API Error: ${err.message}`);
+      if (response.status === 200) return response?.data;
+      else {
+        toast.error('Failed to retrive User Data', {
+          position: 'top-center',
+        });
+      }
+    } catch (error) {
+      console.error('Internal Server Error', error);
+      toast.error('Internal Server Error', {
+        position: 'top-center',
+      });
     }
   };
 
@@ -56,7 +63,6 @@ export const useUsers = () => {
   const updateUser = async (userId: any, userData: any) => {
     try {
       const response = await useDataService.putService(`${EDIT_USERS_URL}/${userId}?role=${getUserRole()}`, userData);
-      console.log('response', response)
       if (response.status === 200) {
         toast.success('Profile Updated Successfully', { position: 'top-center' });
         return response.data;
@@ -69,5 +75,5 @@ export const useUsers = () => {
     }
   };
 
-  return { getAllUsers, addUser, updateUser, getUserById, getUserRole };
+  return { getAllUsers, addUser, updateUser, getUserById };
 }

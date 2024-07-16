@@ -1,6 +1,5 @@
 import moment from "moment";
 import { defaultLocale } from "../../constants/defaultLocale.ts";
-import { createFilterOptions } from "@mui/material";
 
 export const currency = (num: number | bigint) => {
   const result = new Intl.NumberFormat(defaultLocale().currencyLangCode, {
@@ -19,7 +18,14 @@ export const formatFromDate = (date: string | Date) => {
   return formatedDate;
 };
 
-export const formatYearFromDate = (date: string) => {
-  const formatedDate = moment(date).format('YYYY');
-  return formatedDate;
+export const getUserRole = () => {
+  const user = localStorage.getItem('user');
+  const role = user ? JSON.parse(user).role : 'null';
+  return role
+};
+
+export const getUserId = () => {
+  const user = localStorage.getItem('user');
+  const role = user ? JSON.parse(user).id : 'null';
+  return role
 };

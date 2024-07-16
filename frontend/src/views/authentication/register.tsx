@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { makeStyles } from '@mui/styles';
 import {
   Container,
   Typography,
@@ -21,49 +20,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { useAuth } from '../../hooks/useAuth.tsx';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    height: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: '#f0f2f5',
-  },
-  paper: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '16px 32px',
-    backgroundColor: '#ffffff',
-    // boxShadow: theme.shadows[5],
-    // borderRadius: theme.shape.borderRadius,
-  },
-  form: {
-    width: '100%',
-    // marginTop: theme.spacing(1),
-  },
-  submit: {
-    // margin: theme.spacing(3, 0, 2),
-  },
-  title: {
-    // margin: theme.spacing(1),
-    fontWeight: 'bold',
-  },
-  input: {
-    '& label.Mui-focused': {
-      color: '#3f51b5',
-    },
-    '& .MuiOutlinedInput-root': {
-      '&.Mui-focused fieldset': {
-        borderColor: '#3f51b5',
-      },
-    },
-  },
-  link: {
-    // marginTop: theme.spacing(2),
-  },
-}));
-
 const validationSchema = Yup.object({
   username: Yup.string().required('User Name is Required'),
   email: Yup.string().email('Invalid email format').required('Email is Required'),
@@ -71,7 +27,7 @@ const validationSchema = Yup.object({
 });
 
 export const Register = () => {
-  const classes = useStyles();
+
   const navigate = useNavigate();
   const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -186,7 +142,7 @@ export const Register = () => {
           <Button
             type="submit"
             fullWidth
-            variant="contained"
+            variant="outlined"
             color="primary"
             className="submit-btn"
           >

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import {
   Box,
@@ -21,9 +21,14 @@ import {
   ManageAccounts,
   Menu,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ShoppingCart,
+  Receipt,
+  Logout
 } from '@mui/icons-material';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import { getUserRole } from '../../components/common/index.tsx';
 
 const drawerWidth = 240;
 
@@ -75,18 +80,32 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-export const AdminSidebar = ({onSelectScreen} : any) => {
+export const Sidebar = () => {
 
   const theme = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const [open, setOpen] = React.useState(false);
-  const [title, setTitle] = React.useState('');
+  const userRole = getUserRole();
 
-  const items = [
+  const [open, setOpen] = useState<boolean>(false);
+  const [title, setTitle] = useState<String>('');
+
+  const adminItems = [
     { text: 'User Accounts', icon: <ManageAccounts />, route: '/admin-user' },
-    { text: 'Products', icon: <LocalShipping />, route: '/product' },
+    { text: 'Products', icon: <LocalShipping />, route: '/admin-product' },
+    { text: 'Orders', icon: <LocalShipping />, route: '/admin-orders' },
+    { text: 'Logout', icon: <Logout />, },
   ];
+
+  const customerItems = [
+    { text: 'Products', icon: <LocalShipping />, route: '/dashboard' },
+    { text: 'Your Orders', icon: <Receipt />, route: '/get-order' },
+    { text: 'Your Cart', icon: <ShoppingCart />, route: '/show-cart' },
+    { text: 'Logout', icon: <Logout />,  },
+  ];
+
+  const items = userRole === 'customer' ? customerItems : adminItems;
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -94,6 +113,16 @@ export const AdminSidebar = ({onSelectScreen} : any) => {
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+  const handleNavigation = (item: any) => {
+    if(item.text === 'Logout') {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      navigate('/')
+    }
+    else navigate(item.route);
+    setOpen(!open);
   };
 
   useEffect(() => {
@@ -148,7 +177,7 @@ export const AdminSidebar = ({onSelectScreen} : any) => {
         <List>
           {items.map((item, index) => (
             <ListItem key={index} disablePadding>
-              <ListItemButton onClick={() => onSelectScreen(item.route)}>
+              <ListItemButton onClick={() => handleNavigation(item)}>
                 <ListItemIcon>
                   {item.icon}
                 </ListItemIcon>
@@ -158,9 +187,9 @@ export const AdminSidebar = ({onSelectScreen} : any) => {
           ))}
         </List>
       </Drawer>
-      <Main open={open} sx={{padding: 0}}>
+      <Main open={open}>
         <DrawerHeader />
       </Main>
     </Box>
   );
-}
+};

@@ -16,9 +16,10 @@ import {
   Pagination,
   Card,
   IconButton,
+  Button,
 } from '@mui/material';
-import { currency, formatFromDate, formatYearFromDate } from '../common/index.tsx';
-import { AddCircle, ArrowDropDown, Clear, Close, Edit, Search, Tune, Visibility } from '@mui/icons-material';
+import { currency, formatFromDate } from '../common/index.tsx';
+import { AddCircle, Delete, Edit } from '@mui/icons-material';
 import Scrollbars from 'react-custom-scrollbars-2';
 
 interface Props {
@@ -29,18 +30,16 @@ interface Props {
   onColumnClick?: any;
   getQuery?: any;
   onAdd?: any;
+  onViewOrder?: any;
   hasAdd?: any;
+  hasDelete?: any;
+  onDelete?: any
   hasEdit?: any;
   onEdit?: any;
   isLoading?: boolean;
-  hideSearch?: boolean;
   hideHeader?: boolean;
-  totalPages?: number;
-  pagination?: any;
   title?: any;
-  page?: any;
   onSort?: any;
-  isPaginationHide?: any;
 }
 
 export const RenderIf = ({
@@ -68,6 +67,7 @@ const CustomTableCell = ({
   row,
   column,
   onColumnClick,
+  onViewOrder
 }: any) => {
   /* eslint-disable no-else-return */
   if (column.priceColumn) {
@@ -76,10 +76,13 @@ const CustomTableCell = ({
     return <>{row[column.id] === 'N/A' ? row[column.id] : formatFromDate(row[column.id])}</>;
   } else if (column.hasColumnClick) {
     return returnLink(row, column, onColumnClick);
+  } else if(column.isButton) {
+    return <Button variant='outlined' onClick={() => onViewOrder(row, column)}>View Orders</Button>
+  } else if(column.isUploadBtn) {
+    return <Button variant='outlined' onClick={() => onViewOrder(row, column)}>Update Orders Status</Button>
   }
   return row[column.id];
 };
-
 
 export const TableComponent = ({
   rows,
@@ -90,17 +93,14 @@ export const TableComponent = ({
   onAdd,
   hasAdd,
   onEdit,
+  onViewOrder,
   hasEdit,
-  totalPages,
-  getQuery,
+  hasDelete,
+  onDelete,
   isLoading = false,
-  hideSearch = false,
-  hideHeader = false,
-  pagination,
   title,
-  page,
   onSort,
-  isPaginationHide,
+  hideHeader
 }: Props) => {
   type Order = 'asc' | 'desc';
 
@@ -108,15 +108,6 @@ export const TableComponent = ({
   const [orderBy, setOrderBy] = React.useState<string>(initialOrderBy);
   const [localRows, setLocalRows] = useState(rows);
   const [placeholder, setPlaceholder] = useState('');
-
-  useEffect(() => {
-    if (title === 'All Accounts') setPlaceholder('Account Name');
-    else if (title === 'All Deals') setPlaceholder('Deal Name');
-    else if (title === 'All Policies') setPlaceholder('Policy Number');
-    else if (title === 'All Loans') setPlaceholder('Loan Name');
-    else if (title === 'Illustrations & Statements') setPlaceholder('Policy Number');
-    else if (title === 'File List') setPlaceholder('Uploaded Date');
-  }, [title]);
 
   useEffect(() => {
     onSort && onSort(order, orderBy);
@@ -148,20 +139,6 @@ export const TableComponent = ({
               {title}
             </Typography>
             <Box display="flex" justifyContent='flex-end' gap={2} alignItems="center" >
-              {!hideSearch && (
-                <TextField
-                  variant="outlined"
-                  placeholder={`Enter ${placeholder}`}
-                  className='search-textfield'
-                  InputProps={{
-                    startAdornment: (
-                      <Search style={{ color: 'gray', width: '18px', marginRight: '5px' }} />
-                    ),
-                  }}
-                  onChange={(e) => getQuery && getQuery(e)}
-                  size="small"
-                />
-              )}
               {
                 hasAdd ? <div>
                   <IconButton onClick={onAdd} data-testid="on-add-click">
@@ -301,6 +278,7 @@ export const TableComponent = ({
                                       row,
                                       column,
                                       onColumnClick,
+                                      onViewOrder
                                     }}
                                   />
                                 </TableCell>
@@ -321,6 +299,19 @@ export const TableComponent = ({
                                 </Box>
                               </TableCell> : null
                             }
+                            {
+                              hasDelete ? <TableCell align="right">
+                                <Box display='flex' justifyContent='right'>
+                                  <IconButton
+                                  disabled={row?.disableDelete || false}
+                                  onClick={() => onDelete(row)}
+                                  data-testid="on-delete-click"
+                                >
+                                    <Delete />
+                                    </IconButton>
+                                </Box>
+                              </TableCell> : null
+                            }
 
                           </TableRow>
                         ))
@@ -338,19 +329,6 @@ export const TableComponent = ({
           </Scrollbars>
         </Box>
       </Card>
-      {
-        !isPaginationHide ? <Pagination
-          count={totalPages}
-          variant="outlined"
-          size="small"
-          page={page}
-          shape="rounded"
-          color="primary"
-          className='pagination'
-          onChange={pagination}
-        /> : null
-      }
-
     </Box>
   );
 };

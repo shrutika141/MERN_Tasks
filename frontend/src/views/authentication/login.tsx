@@ -25,12 +25,11 @@ const validationSchema = Yup.object({
   password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is Required'),
 });
 
-export const Login = () => {
+export const Login = ({ setToken }: any) => {
   const navigate = useNavigate()
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [user, setUser] = useState(null);
 
   const { control, handleSubmit, formState: { errors } } = useForm({
     mode: 'onTouched',
@@ -46,20 +45,25 @@ export const Login = () => {
   };
 
   const onSubmit = async (data: any) => {
-    const { email, password } = data;
-    const user = await login(email, password);
-    if (user) {
-      setUser(user);
-      if (user.role === 'admin' || user.role === 'subadmin') {
-        setShowModal(true);
-      } else {
-        navigate('/dashboard');
+    try {
+      const { email, password } = data;
+      const user = await login(email, password);
+      if (user) {
+        if (user.role === 'admin' || user.role === 'subadmin') {
+          setShowModal(true);
+        } else {
+          setToken(localStorage.getItem('token'))
+          navigate('/dashboard');
+        }
       }
+    } catch(error) {
+      console.log('error', error)
     }
   };
 
   const handleSelection = (path: string) => {
     setShowModal(false);
+    setToken(localStorage.getItem('token'))
     navigate(path);
   };
 
@@ -129,7 +133,7 @@ export const Login = () => {
           <Button
             type="submit"
             fullWidth
-            variant="contained"
+            variant="outlined"
             color="primary"
             className="submit-btn"
           >
@@ -140,7 +144,6 @@ export const Login = () => {
       </Paper>
       <Modal
         open={showModal}
-        // open={true}
         onClose={() => setShowModal(false)}
         className="modal"
       >
@@ -150,7 +153,7 @@ export const Login = () => {
           </Typography>
           <Button
             fullWidth
-            variant="contained"
+            variant="outlined"
             color="primary"
             onClick={() => handleSelection('/admin-user')}
             style={{ marginBottom: 16 }}
@@ -159,7 +162,7 @@ export const Login = () => {
           </Button>
           <Button
             fullWidth
-            variant="contained"
+            variant="outlined"
             color="primary"
             onClick={() => handleSelection('/dashboard')}
           >

@@ -1,17 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-    TextField,
-    Button,
-    Grid,
-    Typography,
-    Container,
-    Paper,
-    Box,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem
-} from '@mui/material';
+import { TextField, Button, Grid, Typography, Container, Paper, Box } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
@@ -19,49 +7,47 @@ import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { useUsers } from '../../hooks/useUsers.tsx';
+import { useProduct } from '../../../hooks/useProducts.tsx';
 
 const validationSchema = Yup.object({
-    username: Yup.string().required('Username is required'),
-    email: Yup.string().email('Invalid email format').required('Email is required'),
-    role: Yup.string().required('Role is required'),
-    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is Required'),
+    product_name: Yup.string().required('Product Name is required'),
+    product_type: Yup.string().required('Product Type is required'),
+    amount: Yup.string().required('Amount is required'),
+    description: Yup.string().required('Description is required'),
 });
 
-export const AddUser = () => {
-
+export const AddProduct = () => {
     const navigate = useNavigate();
-    
-    const { addUser } = useUsers();
+    const { addProduct } = useProduct();
 
     const { control, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: yupResolver(validationSchema),
         defaultValues: {
-            username: '',
-            email: '',
-            role: '',
-            password: ''
+            product_name: '',
+            product_type: '',
+            amount: '',
+            description: ''
         },
     });
 
     useEffect(() => {
         reset({
-            username: '',
-            email: '',
-            role: '',
-            password: ''
+            product_name: '',
+            product_type: '',
+            amount: '',
+            description: ''
         });
     }, [reset]);
 
     const onSubmit = async (data) => {
         try {
-            await addUser(data);
-            toast.success('User added successfully', {
+            await addProduct(data);
+            toast.success('Product added successfully', {
                 position: 'top-center',
             });
-            navigate('/admin-user');
+            navigate('/admin-product');
         } catch (err) {
-            console.error('Error adding user:', err);
+            console.error('Error adding product:', err);
             toast.error(err.message, {
                 position: 'top-center',
             });
@@ -72,13 +58,13 @@ export const AddUser = () => {
         <Container className='container'>
             <Paper className="login-wrapper">
                 <Typography component="h1" variant="h5" className="main-heading">
-                    Add User
+                    Add Product
                 </Typography>
                 <form className="form" onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <Controller
-                                name="username"
+                                name="product_name"
                                 control={control}
                                 render={({ field }) => (
                                     <TextField
@@ -86,17 +72,17 @@ export const AddUser = () => {
                                         className="textfield"
                                         variant="outlined"
                                         fullWidth
-                                        id="username"
-                                        label="Username"
-                                        error={Boolean(errors.username)}
-                                        helperText={errors.username?.message}
+                                        id="product_name"
+                                        label="Product Name"
+                                        error={Boolean(errors.product_name)}
+                                        helperText={errors.product_name?.message}
                                     />
                                 )}
                             />
                         </Grid>
                         <Grid item xs={12}>
                             <Controller
-                                name="email"
+                                name="product_type"
                                 control={control}
                                 render={({ field }) => (
                                     <TextField
@@ -104,39 +90,17 @@ export const AddUser = () => {
                                         className="textfield"
                                         variant="outlined"
                                         fullWidth
-                                        id="email"
-                                        label="Email Address"
-                                        error={Boolean(errors.email)}
-                                        helperText={errors.email?.message}
+                                        id="product_type"
+                                        label="Product Type"
+                                        error={Boolean(errors.product_type)}
+                                        helperText={errors.product_type?.message}
                                     />
                                 )}
                             />
                         </Grid>
                         <Grid item xs={12}>
                             <Controller
-                                name="role"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormControl variant="outlined" fullWidth error={Boolean(errors.role)}>
-                                        <InputLabel id="role-label">Select Role</InputLabel>
-                                        <Select
-                                            {...field}
-                                            labelId="role-label"
-                                            id="role"
-                                            label="Select Role"
-                                        >
-                                            <MenuItem value="admin">Admin</MenuItem>
-                                            <MenuItem value="subadmin">Subadmin</MenuItem>
-                                            <MenuItem value="customer">Customer</MenuItem>
-                                        </Select>
-                                        {errors.role && <Typography color="error">{errors.role.message}</Typography>}
-                                    </FormControl>
-                                )}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Controller
-                                name="password"
+                                name="amount"
                                 control={control}
                                 render={({ field }) => (
                                     <TextField
@@ -144,11 +108,29 @@ export const AddUser = () => {
                                         className="textfield"
                                         variant="outlined"
                                         fullWidth
-                                        id="password"
-                                        label="Enter Password"
-                                        type="password"
-                                        error={Boolean(errors.password)}
-                                        helperText={errors.password?.message}
+                                        id="amount"
+                                        label="Price"
+                                        error={Boolean(errors.amount)}
+                                        helperText={errors.amount?.message}
+                                    />
+                                )}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Controller
+                                name="description"
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        className="textfield"
+                                        variant="outlined"
+                                        fullWidth
+                                        id="description"
+                                        label="Enter description"
+                                        type="textarea"
+                                        error={Boolean(errors.description)}
+                                        helperText={errors.description?.message}
                                     />
                                 )}
                             />

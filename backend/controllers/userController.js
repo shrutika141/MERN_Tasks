@@ -1,8 +1,10 @@
-const { User } = require("../models");
+const { User, Order } = require("../models");
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({
+      include: [{ model: Order, as: 'orders' }],
+    });
     res.status(200).send({
       status: 200,
       data: users,

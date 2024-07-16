@@ -1,22 +1,17 @@
-import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import "./App.scss";
 import { Login } from './views/authentication/login.tsx';
-import { Register } from './views/authentication/register.tsx';
-import { ProtectedRoute } from './routes/protectedRoutes.tsx';
-import { Dashboard } from './views/dashboard/dashboard.tsx';
-import { AdminPanel } from './views/admin/admin.tsx';
-import { EditUser } from './views/users/editUsers.tsx';
-import { AddUser } from './views/users/addUser.tsx';
+import { Sidebar } from './views/sidebar/sidebar.tsx';
+import { Routing } from './routes/index.tsx';
 
 const App = () => {
 
   const theme = createTheme({
     palette: {
       primary: {
-        main: '#1976d2',
+        main: '#859db6',
       },
       secondary: {
         main: '#dc004e',
@@ -24,21 +19,29 @@ const App = () => {
     },
   });
 
+  const [token, setToken] = useState(localStorage.getItem('token'));
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setToken(localStorage.getItem('token'));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route element={<ProtectedRoute allowedRoles={['customer', 'admin', 'subadmin']} />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Route>
-        
-        <Route element={<ProtectedRoute allowedRoles={['admin', 'subadmin']} />}>
-          <Route path="/admin-user" element={<AdminPanel />} />
-          <Route path="/edit-user-profile/:id?" element={<EditUser />} />
-          <Route path="/add-user-profile" element={<AddUser />} />
-        </Route>
-      </Routes>
+      {token ? (
+        <>
+          <Sidebar  />
+          <Routing />
+        </>
+      ) : (
+        <Login setToken={setToken} />
+      )}
     </ThemeProvider>
   );
 };

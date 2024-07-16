@@ -16,8 +16,17 @@ export const USERS_COLUMN = [
         displayName: 'User Role'
     },
     {
+        id: 'totalOrder',
+        displayName: 'Total Orders Placed',
+    },
+    {
         id: 'createdAt',
         displayName: 'Created At',
         isDateTime: true
+    },
+    {
+        id: 'viewOrder',
+        displayName: 'View Order',
+        isButton: true
     },
 ]
